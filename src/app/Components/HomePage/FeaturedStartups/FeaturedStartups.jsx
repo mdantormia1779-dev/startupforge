@@ -40,7 +40,6 @@ const featuredStartups = [
   },
 ];
 
-// অ্যানিমেশন ভেরিয়েন্ট
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -56,17 +55,17 @@ const cardVariants = {
 
 const FeaturedStartups = () => {
   return (
-    <section className="bg-[#0b0e16] text-white px-6 md:px-10 py-20">
+    <section className="bg-white dark:bg-[#0b0e16] text-gray-900 dark:text-white px-6 md:px-10 py-20 transition-colors duration-300">
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
         <div>
           <h2 className="text-4xl font-extrabold tracking-tight">
             Featured Startups
           </h2>
-          <p className="text-gray-400 mt-2 text-lg">
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-lg">
             Explore the most promising ventures of the year
           </p>
         </div>
-        <button className="text-indigo-400 hover:text-indigo-300 flex items-center gap-2 font-semibold transition-all">
+        <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-2 font-semibold transition-all">
           View All <ArrowRight size={18} />
         </button>
       </div>
@@ -84,7 +83,7 @@ const FeaturedStartups = () => {
             variants={cardVariants}
             whileHover={{ y: -10 }}
           >
-            <FeatureCard startup={startup}></FeatureCard>
+            <FeatureCard startup={startup} />
           </motion.div>
         ))}
       </motion.div>

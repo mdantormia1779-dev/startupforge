@@ -24,7 +24,7 @@ const testimonials = [
 
 const Experience = () => {
   return (
-    <section className="bg-[#0d0f17] text-white py-20 px-6 overflow-hidden">
+    <section className="bg-white dark:bg-[#0d0f17] text-gray-900 dark:text-white py-20 px-6 overflow-hidden transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         
         {/* Title Animation */}
@@ -57,15 +57,15 @@ const Experience = () => {
                 visible: { opacity: 1, y: 0 }
               }}
             >
-              <Card className="bg-[#161922] border-gray-800 p-8 flex flex-col gap-4 hover:border-purple-500/50 transition-colors">
+              <Card className="bg-gray-50 dark:bg-[#161922] border-gray-200 dark:border-gray-800 p-8 flex flex-col gap-4 hover:border-purple-500/50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gray-700" />
+                  <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700" />
                   <div>
-                    <h4 className="font-bold text-gray-300">{t.name}</h4>
-                    <p className="text-xs text-gray-400">{t.role}</p>
+                    <h4 className="font-bold text-gray-900 dark:text-gray-300">{t.name}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t.role}</p>
                   </div>
                 </div>
-                <p className="text-gray-400 text-sm leading-relaxed mt-2 italic">{t.quote}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mt-2 italic">{t.quote}</p>
               </Card>
             </motion.div>
           ))}
@@ -77,15 +77,15 @@ const Experience = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="bg-[#161922] border border-gray-800 rounded-[2rem] p-12 text-center flex flex-col items-center gap-6"
+          className="bg-gray-50 dark:bg-[#161922] border border-gray-200 dark:border-gray-800 rounded-[2rem] p-12 text-center flex flex-col items-center gap-6"
         >
           <h2 className="text-4xl font-bold">Ready to Forge Your Future?</h2>
-          <p className="text-gray-400 max-w-md">
+          <p className="text-gray-600 dark:text-gray-400 max-w-md">
             Whether youre starting from zero or scaling to the moon, our infrastructure and community are built for your success.
           </p>
           <div className="flex gap-4">
             <Button className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-8">Get Started for Free</Button>
-            <Button variant="outline" className="border-gray-700 bg-transparent hover:bg-gray-800">Book a Demo</Button>
+            <Button variant="outline" className="border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800">Book a Demo</Button>
           </div>
         </motion.div>
       </div>

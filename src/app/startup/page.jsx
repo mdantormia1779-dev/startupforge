@@ -65,27 +65,28 @@ const Startups = () => {
   });
 
   return (
-    <section className="bg-[#0b0e16] text-white px-6 md:px-10 py-20">
+    <section className="bg-background text-foreground px-6 md:px-10 py-20 transition-colors duration-300">
       <div className="mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">Browse Startups</h1>
-        <p className="text-gray-400 text-lg">Explore innovative startups and join the right team.</p>
+        <p className="text-muted-foreground text-lg">Explore innovative startups and join the right team.</p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-16 bg-[#161922] p-4 rounded-2xl border border-gray-800">
+      {/* Filter Section */}
+      <div className="flex flex-col md:flex-row gap-4 mb-16 bg-card p-4 rounded-2xl border border-border shadow-sm">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-3.5 text-gray-500" size={18} />
+          <Search className="absolute left-3 top-3.5 text-muted-foreground" size={18} />
           <Input
             placeholder="Search startups by name or industry..."
-            className="pl-10 h-12 bg-[#0d0f17] border-gray-700"
+            className="pl-10 h-12 bg-background border-input"
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
         <Select onValueChange={setIndustryFilter}>
-          <SelectTrigger className="w-full md:w-52 h-12 bg-[#0d0f17] border-gray-700">
+          <SelectTrigger className="w-full md:w-52 h-12 bg-background border-input">
             <SelectValue placeholder="All Industries" />
           </SelectTrigger>
-          <SelectContent className="bg-[#161922] border-gray-700 text-white">
+          <SelectContent className="bg-popover border-border">
             <SelectItem value="all">All Industries</SelectItem>
             <SelectItem value="Fintech">Fintech</SelectItem>
             <SelectItem value="CleanTech">CleanTech</SelectItem>
@@ -94,10 +95,10 @@ const Startups = () => {
         </Select>
 
         <Select onValueChange={setStageFilter}>
-          <SelectTrigger className="w-full md:w-52 h-12 bg-[#0d0f17] border-gray-700">
+          <SelectTrigger className="w-full md:w-52 h-12 bg-background border-input">
             <SelectValue placeholder="All Stages" />
           </SelectTrigger>
-          <SelectContent className="bg-[#161922] border-gray-700 text-white">
+          <SelectContent className="bg-popover border-border">
             <SelectItem value="all">All Stages</SelectItem>
             <SelectItem value="Seed">Seed</SelectItem>
             <SelectItem value="Series A">Series A</SelectItem>
@@ -108,12 +109,19 @@ const Startups = () => {
       <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredStartups.length > 0 ? (
           filteredStartups.map((startup) => (
-            <motion.div key={startup.id} whileHover={{ y: -10 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <motion.div 
+              key={startup.id} 
+              whileHover={{ y: -10 }} 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }}
+            >
               <FeatureCard startup={startup} />
             </motion.div>
           ))
         ) : (
-          <p className="text-gray-500 text-center col-span-full">No startups found matching your criteria.</p>
+          <p className="text-muted-foreground text-center col-span-full">
+            No startups found matching your criteria.
+          </p>
         )}
       </motion.div>
     </section>
