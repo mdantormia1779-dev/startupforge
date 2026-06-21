@@ -5,28 +5,31 @@ import ApplyCard from "../../ApplyCard/ApplyCard";
 
 const opportunities = [
   {
-    role: "Frontend Developer",
-    startup: "TechNova",
-    skills: ["React", "TypeScript", "Tailwind"],
-    type: "Full Time",
-    location: "Remote",
-    deadline: "Apply by 25th June",
+    id: "opp1",
+    startup_id: "1", // TechNova
+    role_title: "Frontend Developer",
+    required_skills: ["React", "TypeScript", "Tailwind"],
+    work_type: "Remote",
+    commitment_level: "Full Time",
+    deadline: "2026-06-25",
   },
   {
-    role: "UI/UX Designer",
-    startup: "GreenFuture",
-    skills: ["Figma", "UI Design", "Prototyping"],
-    type: "Part Time",
-    location: "Remote",
-    deadline: "Apply by 30th June",
+    id: "opp2",
+    startup_id: "2", // GreenFuture
+    role_title: "UI/UX Designer",
+    required_skills: ["Figma", "UI Design", "Prototyping"],
+    work_type: "Remote",
+    commitment_level: "Part Time",
+    deadline: "2026-06-30",
   },
   {
-    role: "Marketing Specialist",
-    startup: "EduSpark",
-    skills: ["Marketing", "SEO", "Content"],
-    type: "Full Time",
-    location: "Hybrid",
-    deadline: "Apply by 28th June",
+    id: "opp3",
+    startup_id: "3", // EduSpark
+    role_title: "Marketing Specialist",
+    required_skills: ["Marketing", "SEO", "Content"],
+    work_type: "Hybrid",
+    commitment_level: "Full Time",
+    deadline: "2026-06-28",
   },
 ];
 

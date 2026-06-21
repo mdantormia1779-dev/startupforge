@@ -1,42 +1,56 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link"; // Link ইমপোর্ট করুন
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Briefcase } from "lucide-react";
+import { Briefcase, Calendar } from "lucide-react";
 
 const ApplyCard = ({ job }) => {
   return (
-    <Card className="bg-[#141826] border-gray-800 p-6 rounded-2xl flex flex-col justify-between h-full hover:border-indigo-500/50 transition-colors duration-300">
-      <div>
-        <h3 className="text-xl text-gray-300 font-bold">{job.role}</h3>
-        <p className="text-gray-400 mb-4">{job.startup}</p>
-
-        <div className="flex flex-wrap gap-2 mb-6">
-          {job.skills.map((skill) => (
+    <Card className="bg-[#161922] border-gray-800 rounded-2xl p-6 h-full flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+      <CardHeader className="p-0 mb-4">
+        <h3 className="text-xl font-bold text-white">{job.role_title}</h3>
+        <p className="text-indigo-400 text-sm font-medium">
+          {job.startup_name}
+        </p>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {job.required_skills.map((skill) => (
             <Badge
               key={skill}
-              className="bg-[#1e2335] text-gray-300 hover:bg-[#252b42] border-none px-3 py-1"
+              variant="secondary"
+              className="bg-indigo-500/10 text-indigo-300 border-none"
             >
               {skill}
             </Badge>
           ))}
         </div>
-      </div>
+      </CardHeader>
 
-      <CardContent className="p-0 space-y-4">
-        <div className="flex items-center gap-4 text-sm text-gray-400">
-          <span className="flex items-center gap-1">
-            <Briefcase size={16} /> {job.type}
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin size={16} /> {job.location}
+      <CardContent className="p-0 space-y-3 mb-6">
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Briefcase size={16} className="text-emerald-400" />
+          <span>
+            {job.work_type} • {job.commitment_level}
           </span>
         </div>
-        <p className="text-xs text-gray-500 italic">{job.deadline}</p>
-        <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all duration-300">
-          Apply Now
-        </Button>
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Calendar size={16} className="text-amber-400" />
+          <span>Deadline: {job.deadline}</span>
+        </div>
       </CardContent>
+
+      <CardFooter className="p-0">
+        <Link href={`/oprtunities/${job.id}`} className="w-full">
+          <Button className="w-full bg-white text-black font-bold hover:bg-indigo-500 hover:text-white transition-colors rounded-xl">
+            Apply Now
+          </Button>
+        </Link>
+      </CardFooter>
     </Card>
   );
 };

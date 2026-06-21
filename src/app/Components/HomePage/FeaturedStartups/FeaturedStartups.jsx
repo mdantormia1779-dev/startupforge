@@ -6,28 +6,37 @@ import FeatureCard from "../../FeatureCard/FeatureCard";
 
 const featuredStartups = [
   {
-    name: "TechNova",
-    founder: "Sarah Jenkins",
+    id: "1",
+    startup_name: "TechNova",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=600&auto=format&fit=crop",
     industry: "Fintech",
+    description: "Revolutionizing digital banking with AI-powered personalized financial planning tools for everyone.",
+    funding_stage: "Series A",
+    founder_email: "sarah.jenkins@technova.io",
+    status: "Hiring",
     teamSize: "5 - 8 Members",
-    image:
-      "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=600&auto=format&fit=crop",
   },
   {
-    name: "GreenFuture",
-    founder: "Mark Stofer",
+    id: "2",
+    startup_name: "GreenFuture",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=600&auto=format&fit=crop",
     industry: "CleanTech",
+    description: "Developing smart, modular solar storage systems specifically designed for urban apartment dwellers.",
+    funding_stage: "Seed",
+    founder_email: "mark.stofer@greenfuture.eco",
+    status: "Stealth",
     teamSize: "3 - 5 Members",
-    image:
-      "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=600&auto=format&fit=crop",
   },
   {
-    name: "EduSpark",
-    founder: "Elena Rossi",
+    id: "3",
+    startup_name: "EduSpark",
+    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop",
     industry: "EdTech",
+    description: "A gamified project-based learning platform that bridges the gap between students and industry experts.",
+    funding_stage: "Series A",
+    founder_email: "elena.rossi@eduspark.com",
+    status: "Hiring",
     teamSize: "4 - 6 Members",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop",
   },
 ];
 
