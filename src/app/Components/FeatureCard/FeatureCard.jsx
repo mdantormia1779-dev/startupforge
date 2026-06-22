@@ -11,6 +11,7 @@ import { Briefcase, Users, Mail } from "lucide-react";
 import Link from "next/link";
 
 const FeatureCard = ({ startup }) => {
+  console.log(startup)
   return (
     <Card className="bg-[#111522] border-gray-800 rounded-3xl overflow-hidden shadow-2xl group transition-all hover:border-indigo-500/50">
       {/* Card Image */}
