@@ -1,96 +1,157 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { Edit2, Trash2 } from "lucide-react";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import ManageStartupEdit from "../ManageStartupEdit/ManageStartupEdit";
+import { authClient } from "@/lib/auth-client";
+
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 const ManageStartup = () => {
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { data: session } = authClient.useSession();
+  const userId = session?.user?.id;
 
-  const startup = {
-    name: "Nexus Pay",
-    industry: "FinTech",
-    description: "Nexus Pay is building the next generation of cross-border payment infrastructure for emerging markets. Our platform reduces transaction friction by 60% using proprietary ledger technology and AI-driven compliance checks.",
-    fundingStage: "Seed Round",
-    founded: "March 2023",
-    email: "sarah@nexuspay.io",
-    website: "https://nexuspay.io",
-    stats: [
-      { label: "Active Users", val: "12.4k" },
-      { label: "Burn Rate", val: "$42k/mo" },
-      { label: "Runway", val: "14 Mos" },
-    ],
+  const [startups, setStartups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [selectedStartup, setSelectedStartup] = useState(null);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return; // ✅ user না থাকলে fetch করবো না
+
+    const fetchStartup = async () => {
+      try {
+        const res = await fetch(
+          `${API}/startups/by-owner/${userId}`
+        );
+
+        const data = await res.json();
+
+        // 👉 backend যদি {startups, opportunities} দেয়
+        setStartups(data.startups || []);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStartup();
+  }, [userId]); // ✅ dependency add
+
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(
+        `${API}/startups/${selectedStartup._id}`,
+        { method: "DELETE" }
+      );
+
+      const data = await res.json();
+
+      if (data.deletedCount > 0) {
+        setStartups((prev) =>
+          prev.filter((s) => s._id !== selectedStartup._id)
+        );
+        setIsDeleteOpen(false);
+        setSelectedStartup(null);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleDelete = () => {
-    // এখানে আপনার API Call বা ডিলিট লজিক হবে
-    console.log("Startup deleted successfully!");
-    setIsDeleteModalOpen(false);
-  };
+  if (loading) {
+    return <p className="p-8 text-gray-500">Loading...</p>;
+  }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto transition-colors duration-300">
-      <h1 className="text-3xl font-bold mb-8 text-foreground">Manage Startup</h1>
+    <div className="p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8">Manage Startups</h1>
 
-      {/* Main Startup Card */}
-      <div className="bg-white dark:bg-card border border-gray-200 dark:border-border rounded-2xl p-8 shadow-sm">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-background rounded-2xl flex items-center justify-center font-bold text-2xl text-black dark:text-white">N</div>
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">{startup.name}</h2>
-              <span className="text-xs bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 px-3 py-1 rounded-full">{startup.industry}</span>
-            </div>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setIsUpdateModalOpen(true)}
-              className="p-2 bg-gray-100 dark:bg-background hover:bg-gray-200 dark:hover:bg-border rounded-xl transition-colors"
+      {startups.length === 0 ? (
+        <p className="text-gray-500">No startups found</p>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-6">
+          {startups.map((startup) => (
+            <div
+              key={startup._id}
+              className="bg-background border rounded-2xl p-6"
             >
-              <Edit2 size={18} className="text-foreground" />
-            </button>
-            <button 
-              onClick={() => setIsDeleteModalOpen(true)}
-              className="p-2 bg-red-50 hover:bg-red-100 rounded-xl transition-colors"
-            >
-              <Trash2 size={18} className="text-red-500" />
-            </button>
-          </div>
-        </div>
+              <div className="flex justify-between items-start">
+                <div className="flex gap-4 items-center">
+                  <div className="relative w-16 h-16">
+                    <Image
+                      src={startup.logoUrl}
+                      alt="logo"
+                      fill
+                      className="rounded-xl object-cover"
+                    />
+                  </div>
 
-        <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8">{startup.description}</p>
+                  <div>
+                    <h2 className="text-xl font-bold">
+                      {startup.name}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {startup.industry}
+                    </p>
+                  </div>
+                </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {startup.stats.map((s, i) => (
-            <div key={i} className="bg-gray-50 dark:bg-background p-4 rounded-xl border border-gray-100 dark:border-border">
-              <p className="text-xs text-gray-400 dark:text-muted-foreground">{s.label}</p>
-              <h4 className="text-lg font-bold text-foreground">{s.val}</h4>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedStartup(startup);
+                      setIsUpdateOpen(true);
+                    }}
+                  >
+                    <Edit2 />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSelectedStartup(startup);
+                      setIsDeleteOpen(true);
+                    }}
+                  >
+                    <Trash2 />
+                  </button>
+                </div>
+              </div>
+
+              <p className="mt-4 text-gray-600">
+                {startup.description}
+              </p>
             </div>
           ))}
         </div>
-      </div>
+      )}
 
-      {/* Modals */}
-      <DeleteModal 
-        isOpen={isDeleteModalOpen} 
-        onClose={() => setIsDeleteModalOpen(false)} 
-        onConfirm={handleDelete} 
-        startupName={startup.name} 
-      />
+      {/* DELETE */}
+      {selectedStartup && (
+        <DeleteModal
+          isOpen={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={handleDelete}
+          startupName={selectedStartup.name}
+        />
+      )}
 
-      {isUpdateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-card p-6 rounded-2xl w-full max-w-lg border dark:border-border shadow-2xl">
-            {/* এডিট কম্পোনেন্টটি এখানে লোড হবে */}
-            <ManageStartupEdit />
-            
-            <button 
-              onClick={() => setIsUpdateModalOpen(false)} 
-              className="mt-4 w-full p-3 border dark:border-border rounded-xl font-bold text-foreground hover:bg-gray-50 dark:hover:bg-background transition-colors"
+      {/* UPDATE */}
+      {isUpdateOpen && selectedStartup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-background p-6 rounded-2xl w-full max-w-lg">
+            <ManageStartupEdit
+              startup={selectedStartup}
+              onClose={() => setIsUpdateOpen(false)}
+            />
+
+            <button
+              onClick={() => setIsUpdateOpen(false)}
+              className="mt-4 w-full border p-3 rounded-xl"
             >
               Close
             </button>

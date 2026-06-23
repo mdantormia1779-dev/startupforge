@@ -1,128 +1,105 @@
 "use client";
 import React, { useState } from "react";
-import { UploadCloud, Loader2, CheckCircle2, Save } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-const ManageStartupEdit = () => {
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+const ManageOpportunityEdit = ({ opportunity, onClose, onUpdate }) => {
+  const [saving, setSaving] = useState(false);
+
   const [formData, setFormData] = useState({
-    name: "Nexus Pay",
-    logoUrl: "https://via.placeholder.com/150",
-    industry: "FinTech",
-    description: "Building next-gen cross-border payments.",
-    fundingStage: "Seed",
-    email: "sarah@nexuspay.io",
+    roleTitle: opportunity?.roleTitle || "",
+    requiredSkills: opportunity?.requiredSkills || "",
+    workType: opportunity?.workType || "Remote",
+    commitment: opportunity?.commitment || "Part-time",
+    deadline: opportunity?.deadline || "",
+    description: opportunity?.description || "",
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState("");
-
-  // ইমেজ আপলোড হ্যান্ডেলার
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsLoading(true);
-    setError("");
-    const data = new FormData();
-    data.append("image", file);
-
+  const handleSave = async () => {
+    setSaving(true);
     try {
-      const response = await fetch(
-        `https://api.imgbb.com/1/upload?key=852d1dae776be32b40e694f48fea8d19`,
-        { method: "POST", body: data }
-      );
-      const result = await response.json();
-      if (result.success) {
-        setFormData({ ...formData, logoUrl: result.data.display_url });
-      } else {
-        setError("Image upload failed.");
+      const res = await fetch(`${API}/opportunities/${opportunity._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const result = await res.json();
+      
+      if (result.success || result.modifiedCount > 0) {
+        onUpdate?.(); // লিস্ট রিফ্রেশ করার জন্য কলব্যাক
+        onClose?.();  // মডাল বন্ধ করা
       }
     } catch (err) {
-      setError("Network error.");
-    } finally {
-      setIsLoading(false);
+      console.error("Update error:", err);
     }
+    setSaving(false);
   };
 
-  // ডাটা সেভ হ্যান্ডেলার
-  const handleSave = async () => {
-    setIsSaving(true);
-    // এখানে আপনার API Call বা Backend-এ ডাটা পাঠানোর লজিক বসবে
-    setTimeout(() => {
-      console.log("Saved Data:", formData);
-      setIsSaving(false);
-      alert("Startup updated successfully!");
-    }, 1500);
-  };
-
-  const inputStyle = "w-full p-2 bg-white dark:bg-background border border-gray-300 dark:border-border rounded-lg text-sm";
+  const inputClass = "w-full p-2.5 rounded-xl border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary outline-none transition-all text-sm";
 
   return (
     <div className="space-y-4">
-      {/* Startup Name */}
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-foreground">Startup Name</label>
-        <input value={formData.name} className={inputStyle} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+      {/* Role Title */}
+      <div>
+        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Role Title</label>
+        <input className={inputClass} value={formData.roleTitle} onChange={(e) => setFormData({ ...formData, roleTitle: e.target.value })} />
       </div>
 
-      {/* Logo Upload */}
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-foreground">Startup Logo</label>
-        <input type="file" onChange={handleImageUpload} className="hidden" id="logo-upload" />
-        <label htmlFor="logo-upload" className={`flex items-center gap-3 border-2 border-dashed p-3 rounded-lg cursor-pointer text-sm ${formData.logoUrl ? "border-green-500" : "border-gray-300"}`}>
-          {isLoading ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 className="text-green-500" size={20} />}
-          {isLoading ? "Uploading..." : "Change Logo"}
-        </label>
+      {/* Required Skills */}
+      <div>
+        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Required Skills</label>
+        <input className={inputClass} value={formData.requiredSkills} onChange={(e) => setFormData({ ...formData, requiredSkills: e.target.value })} />
       </div>
 
-      {/* Industry */}
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-foreground">Industry</label>
-        <select className={inputStyle} value={formData.industry} onChange={(e) => setFormData({...formData, industry: e.target.value})}>
-          <option>FinTech</option>
-          <option>EdTech</option>
-          <option>HealthTech</option>
-        </select>
+      {/* Grid: Work Type & Commitment */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Work Type</label>
+          <select value={formData.workType} onChange={(e) => setFormData({ ...formData, workType: e.target.value })} className={inputClass}>
+            <option>Remote</option>
+            <option>On-site</option>
+            <option>Hybrid</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Commitment</label>
+          <select value={formData.commitment} onChange={(e) => setFormData({ ...formData, commitment: e.target.value })} className={inputClass}>
+            <option>Part-time</option>
+            <option>Full-time</option>
+            <option>Contract</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Deadline */}
+      <div>
+        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Deadline</label>
+        <input type="date" className={inputClass} value={formData.deadline} onChange={(e) => setFormData({ ...formData, deadline: e.target.value })} />
       </div>
 
       {/* Description */}
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-foreground">Description</label>
-        <textarea rows="2" className={inputStyle} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+      <div>
+        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Description</label>
+        <textarea rows="3" className={inputClass} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
       </div>
-
-      {/* Funding Stage */}
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-foreground">Funding Stage</label>
-        <select className={inputStyle} value={formData.fundingStage} onChange={(e) => setFormData({...formData, fundingStage: e.target.value})}>
-          <option>Pre-Seed</option>
-          <option>Seed</option>
-          <option>Series A</option>
-        </select>
-      </div>
-
-      {/* Email */}
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-foreground">Founder Email</label>
-        <input type="email" value={formData.email} className={inputStyle} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-      </div>
-
-      {error && <p className="text-xs text-red-500">{error}</p>}
 
       {/* Save Button */}
-      <button 
+      <button
         onClick={handleSave}
-        disabled={isSaving || isLoading}
-        className="w-full flex items-center justify-center gap-2 bg-black dark:bg-primary text-white py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+        disabled={saving}
+        className="w-full bg-primary hover:opacity-90 text-primary-foreground p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all mt-2"
       >
-        {isSaving ? (
-          <><Loader2 className="animate-spin" size={16} /> Saving...</>
+        {saving ? (
+          <>
+            <Loader2 className="animate-spin w-4 h-4" /> Saving...
+          </>
         ) : (
-          <><Save size={16} /> Save Changes</>
+          "Save Changes"
         )}
       </button>
     </div>
   );
 };
 
-export default ManageStartupEdit;
+export default ManageOpportunityEdit;

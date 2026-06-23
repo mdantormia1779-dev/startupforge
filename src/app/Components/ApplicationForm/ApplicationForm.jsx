@@ -4,70 +4,79 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { toast } from "react-toastify";
+import { authClient } from "@/lib/auth-client"; // সেশন থেকে ডাটা নিতে
 
-const ApplicationForm = ({ jobId, startupName, onSubmitSuccess }) => {
-  const handleSubmit = (e) => {
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+const ApplicationForm = ({ jobId, onSubmitSuccess }) => {
+  const [loading, setLoading] = React.useState(false);
+  const { data: session } = authClient.useSession(); // ইউজারের তথ্য নেওয়ার জন্য
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    
+    setLoading(true);
+
+    const form = e.target;
+    const formData = new FormData(form);
+
     const applicationData = {
-      Opportunity_id: jobId,
-      Applicant_email: formData.get("email"),
-      Portfolio_link: formData.get("portfolio"),
-      Motivation: formData.get("motivation"),
-      Status: "Pending",
-      applied_at: new Date().toISOString(),
+      opportunityId: jobId,
+      applicantEmail: formData.get("email"),
+      portfolio: formData.get("portfolio"),
+      motivation: formData.get("motivation"),
+      applicantName: session?.user?.name || "Anonymous", // নাম যোগ করা ভালো
+      status: "Pending",
     };
 
-    console.log("Submitting Application:", applicationData);
-    if (onSubmitSuccess) onSubmitSuccess();
-  };
+    try {
+      const res = await fetch(`${API}/applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(applicationData),
+      });
 
-  // ইনপুট এবং টেক্সট এরিয়ার জন্য কমন স্টাইল
-  const inputClasses = "bg-white dark:bg-[#0d0f17] border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 transition-colors";
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Application sent for approval ⏳");
+        form.reset();
+        if (onSubmitSuccess) onSubmitSuccess();
+      } else {
+        toast.error(data.message || "Failed to submit application");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form className="space-y-4 py-4" onSubmit={handleSubmit}>
       <div>
-        <Label className="text-sm font-medium mb-1 block text-gray-900 dark:text-gray-300">
-          Email Address
-        </Label>
+        <Label>Email Address</Label>
         <Input 
           name="email" 
           type="email" 
+          defaultValue={session?.user?.email || ""} 
           required 
-          className={inputClasses} 
-          placeholder="your@email.com" 
         />
       </div>
+
       <div>
-        <Label className="text-sm font-medium mb-1 block text-gray-900 dark:text-gray-300">
-          Portfolio Link
-        </Label>
-        <Input 
-          name="portfolio" 
-          type="url" 
-          required 
-          className={inputClasses} 
-          placeholder="https://yourportfolio.com" 
-        />
+        <Label>Portfolio Link</Label>
+        <Input name="portfolio" type="url" placeholder="https://yourportfolio.com" required />
       </div>
+
       <div>
-        <Label className="text-sm font-medium mb-1 block text-gray-900 dark:text-gray-300">
-          Motivation
-        </Label>
-        <Textarea 
-          name="motivation" 
-          required 
-          className={`${inputClasses} min-h-25`} 
-          placeholder="Why do you want to join us?" 
-        />
+        <Label>Why are you a good fit?</Label>
+        <Textarea name="motivation" placeholder="Tell us about your experience..." required />
       </div>
-      <Button 
-        type="submit" 
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 transition-colors"
-      >
-        Submit Application
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Submitting..." : "Submit Application"}
       </Button>
     </form>
   );

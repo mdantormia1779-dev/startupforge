@@ -5,7 +5,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, startupName }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-100">
       <div className="bg-white dark:bg-card p-6 rounded-3xl w-full max-w-sm text-center border border-border shadow-2xl">
         {/* Icon Container */}
         <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-950/50 rounded-full flex items-center justify-center mb-4">
