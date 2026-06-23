@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Edit2, Trash2 } from "lucide-react";
 import DeleteModal from "../DeleteModal/DeleteModal";
-import ManageStartupEdit from "../ManageStartupEdit/ManageStartupEdit";
 import { authClient } from "@/lib/auth-client";
+import ManageStartUpEdit from "../ManageStartupEdit/ManageStartupEdit";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,18 +19,35 @@ const ManageStartup = () => {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  useEffect(() => {
-    if (!userId) return; // ✅ user না থাকলে fetch করবো না
+  // ✅ FIX: function outside useEffect so it can be reused
+  const fetchStartup = useCallback(async () => {
+    if (!userId) return;
 
-    const fetchStartup = async () => {
+    try {
+      setLoading(true);
+
+      const res = await fetch(`${API}/startups/by-owner/${userId}`);
+      const data = await res.json();
+
+      setStartups(data.startups || []);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  // ✅ call on mount / user change
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadData = async () => {
       try {
-        const res = await fetch(
-          `${API}/startups/by-owner/${userId}`
-        );
+        setLoading(true);
+
+        const res = await fetch(`${API}/startups/by-owner/${userId}`);
 
         const data = await res.json();
-
-        // 👉 backend যদি {startups, opportunities} দেয়
         setStartups(data.startups || []);
       } catch (err) {
         console.log(err);
@@ -39,21 +56,20 @@ const ManageStartup = () => {
       }
     };
 
-    fetchStartup();
-  }, [userId]); // ✅ dependency add
+    loadData();
+  }, [userId]);
 
   const handleDelete = async () => {
     try {
-      const res = await fetch(
-        `${API}/startups/${selectedStartup._id}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`${API}/startups/${selectedStartup._id}`, {
+        method: "DELETE",
+      });
 
       const data = await res.json();
 
       if (data.deletedCount > 0) {
         setStartups((prev) =>
-          prev.filter((s) => s._id !== selectedStartup._id)
+          prev.filter((s) => s._id !== selectedStartup._id),
         );
         setIsDeleteOpen(false);
         setSelectedStartup(null);
@@ -92,12 +108,8 @@ const ManageStartup = () => {
                   </div>
 
                   <div>
-                    <h2 className="text-xl font-bold">
-                      {startup.name}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {startup.industry}
-                    </p>
+                    <h2 className="text-xl font-bold">{startup.name}</h2>
+                    <p className="text-sm text-gray-500">{startup.industry}</p>
                   </div>
                 </div>
 
@@ -122,9 +134,7 @@ const ManageStartup = () => {
                 </div>
               </div>
 
-              <p className="mt-4 text-gray-600">
-                {startup.description}
-              </p>
+              <p className="mt-4 text-gray-600">{startup.description}</p>
             </div>
           ))}
         </div>
@@ -144,9 +154,10 @@ const ManageStartup = () => {
       {isUpdateOpen && selectedStartup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-background p-6 rounded-2xl w-full max-w-lg">
-            <ManageStartupEdit
+            <ManageStartUpEdit
               startup={selectedStartup}
               onClose={() => setIsUpdateOpen(false)}
+              onUpdate={fetchStartup} // ✅ now works perfectly
             />
 
             <button

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Edit2,
   Trash2,
@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import AddOpportunity from "../AddOpportunity/AddOpportunity";
-import ManageOpportunityEdit from "../ManageStartupEdit/ManageStartupEdit";
 import { authClient } from "@/lib/auth-client";
+import ManageOpportunityEdit from "../ManageOpportunityEdit/ManageOpportunityEdit";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,29 +27,41 @@ const ManageOpportunities = () => {
   const [selectedOp, setSelectedOp] = useState(null);
   const [modalMode, setModalMode] = useState("add");
 
-  // ✅ correct fetch
+  // useCallback ব্যবহার করা হয়েছে যাতে চাইল্ড কম্পোনেন্ট থেকে এটি কল করলে রি-রেন্ডার সমস্যা না হয়
+  const fetchOpportunities = useCallback(async () => {
+    if (!userId) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/startups/by-owner/${userId}`);
+      const data = await res.json();
+      setOpportunities(data.opportunities || []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  // useEffect এর ভেতরেই ফাংশনটি লিখুন
   useEffect(() => {
     if (!userId) return;
 
-    const fetchOpportunities = async () => {
+    // সরাসরি ইফেক্টের ভেতর async ফাংশন তৈরি করুন
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(
-          `${API}/startups/by-owner/${userId}`
-        );
-
+        const res = await fetch(`${API}/startups/by-owner/${userId}`);
         const data = await res.json();
-
-        // 👉 backend থেকে opportunities নিচ্ছি
         setOpportunities(data.opportunities || []);
       } catch (err) {
-        console.log(err);
+        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOpportunities();
-  }, [userId]);
+    loadData();
+  }, [userId]); // এখানে শুধুমাত্র userId নির্ভরতা থাকবে
 
   const openModal = (mode, op = null) => {
     setModalMode(mode);
@@ -62,11 +74,9 @@ const ManageOpportunities = () => {
       await fetch(`${API}/opportunities/${selectedOp._id}`, {
         method: "DELETE",
       });
-
       setOpportunities((prev) =>
-        prev.filter((op) => op._id !== selectedOp._id)
+        prev.filter((op) => op._id !== selectedOp._id),
       );
-
       setIsDeleteModalOpen(false);
       setSelectedOp(null);
     } catch (err) {
@@ -75,7 +85,7 @@ const ManageOpportunities = () => {
   };
 
   if (!userId) {
-    return <p className="p-8">Authenticating...</p>;
+    return <p className="p-8 text-center">Authenticating...</p>;
   }
 
   return (
@@ -83,65 +93,67 @@ const ManageOpportunities = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold text-foreground">
             Manage Opportunities
           </h1>
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             View and manage your posted roles.
           </p>
         </div>
 
         <button
           onClick={() => openModal("add")}
-          className="bg-black text-white px-4 py-2 rounded-xl flex items-center gap-2"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-xl flex items-center gap-2 hover:opacity-90"
         >
           <PlusCircle size={16} /> Add New Role
         </button>
       </div>
 
-      {/* Loader */}
+      {/* Grid Content */}
       {loading ? (
         <div className="flex justify-center p-10">
-          <Loader2 className="animate-spin" size={32} />
+          <Loader2 className="animate-spin text-primary" size={32} />
         </div>
       ) : opportunities.length === 0 ? (
-        <p className="text-gray-500">No opportunities found</p>
+        <p className="text-muted-foreground text-center">
+          No opportunities found
+        </p>
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
           {opportunities.map((op) => (
             <div
               key={op._id}
-              className="bg-background p-6 rounded-2xl border shadow-sm"
+              className="bg-card p-6 rounded-2xl border border-border shadow-sm"
             >
               <div className="flex justify-between mb-4">
-                <Briefcase />
-
+                <Briefcase className="text-primary" />
                 <div className="flex gap-2">
-                  <button onClick={() => openModal("edit", op)}>
+                  <button
+                    onClick={() => openModal("edit", op)}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     <Edit2 size={16} />
                   </button>
-
                   <button
                     onClick={() => {
                       setSelectedOp(op);
                       setIsDeleteModalOpen(true);
                     }}
-                    className="text-red-500"
+                    className="text-red-500 hover:text-red-600"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
               </div>
 
-              <h3 className="font-bold text-lg">
+              <h3 className="font-bold text-lg text-card-foreground">
                 {op.roleTitle}
               </h3>
-
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 {op.requiredSkills}
               </p>
 
-              <div className="flex gap-4 text-xs text-gray-400">
+              <div className="flex gap-4 text-xs text-muted-foreground">
                 <span>{op.workType}</span>
                 <span className="flex items-center gap-1">
                   <Clock size={12} /> {op.deadline}
@@ -152,7 +164,7 @@ const ManageOpportunities = () => {
         </div>
       )}
 
-      {/* Delete */}
+      {/* Delete Modal */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -160,14 +172,12 @@ const ManageOpportunities = () => {
         startupName={selectedOp?.roleTitle || ""}
       />
 
-      {/* Modal */}
+      {/* Edit/Add Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-2xl w-full max-w-lg">
-            <h2 className="text-xl font-bold mb-4">
-              {modalMode === "add"
-                ? "Add Opportunity"
-                : "Edit Opportunity"}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div className="bg-card p-6 rounded-2xl w-full max-w-lg border border-border">
+            <h2 className="text-xl font-bold mb-4 text-card-foreground">
+              {modalMode === "add" ? "Add Opportunity" : "Edit Opportunity"}
             </h2>
 
             {modalMode === "add" ? (
@@ -176,12 +186,13 @@ const ManageOpportunities = () => {
               <ManageOpportunityEdit
                 opportunity={selectedOp}
                 onClose={() => setIsModalOpen(false)}
+                onUpdate={fetchOpportunities}
               />
             )}
 
             <button
               onClick={() => setIsModalOpen(false)}
-              className="w-full mt-4 border p-3 rounded-xl"
+              className="w-full mt-4 border border-border p-3 rounded-xl text-muted-foreground hover:bg-muted"
             >
               Close
             </button>

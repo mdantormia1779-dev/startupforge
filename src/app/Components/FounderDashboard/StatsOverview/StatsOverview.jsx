@@ -1,32 +1,39 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { authClient } from "@/lib/auth-client"; // ✅ FIX
+import { authClient } from "@/lib/auth-client";
 import StartupHealthScore from "../StartupHealthScore/StartupHealthScore";
-import UpcomingBenchmarks from "../UpcomingBenchmarks/UpcomingBenchmarks";
 import { RecentApplications } from "../RecentApplications/RecentApplications";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 export const StatsOverview = () => {
   const { data: session } = authClient.useSession();
+
+  const email = session?.user?.id;
   const userId = session?.user?.id;
 
   const [opportunities, setOpportunities] = useState([]);
+  const [applications, setApplications] = useState([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ✅ user না থাকলে loading বন্ধ
-    if (!userId) return;
+    if (!email || !userId) return;
 
-    const fetchOpportunities = async () => {
+    const fetchAllData = async () => {
       try {
-        const res = await fetch(
-          `${API}/startups/by-owner/${userId}`
-        );
+        // 🔹 parallel fetch
+        const [oppRes, appRes] = await Promise.all([
+          fetch(`${API}/startups/by-owner/${userId}`),
+          fetch(`${API}/applications/by-founder/${email}`),
+        ]);
 
-        const data = await res.json();
+        const oppData = await oppRes.json();
+        const appData = await appRes.json();
 
-        setOpportunities(data.opportunities || []);
+        setOpportunities(oppData.opportunities || []);
+        setApplications(appData || []);
       } catch (err) {
         console.log(err);
       } finally {
@@ -34,8 +41,14 @@ export const StatsOverview = () => {
       }
     };
 
-    fetchOpportunities();
-  }, [userId]);
+    fetchAllData();
+  }, [email, userId]);
+
+  // ✅ dynamic stats
+  const totalApplications = applications.length;
+  const acceptedMembers = applications.filter(
+    (a) => a.status === "Accepted"
+  ).length;
 
   return (
     <div className="space-y-8">
@@ -51,28 +64,20 @@ export const StatsOverview = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-card p-6 rounded-2xl border shadow-sm">
-          <p className="text-[10px] font-bold text-muted-foreground">
-            TOTAL OPPORTUNITIES
-          </p>
-          <h3 className="text-4xl font-bold mt-2">
-            {loading ? "..." : opportunities.length}
-          </h3>
-        </div>
+        <StatCard
+          title="TOTAL OPPORTUNITIES"
+          value={loading ? "..." : opportunities.length}
+        />
 
-        <div className="bg-card p-6 rounded-2xl border shadow-sm">
-          <p className="text-[10px] font-bold text-muted-foreground">
-            TOTAL APPLICATIONS
-          </p>
-          <h3 className="text-4xl font-bold mt-2">142</h3>
-        </div>
+        <StatCard
+          title="TOTAL APPLICATIONS"
+          value={loading ? "..." : totalApplications}
+        />
 
-        <div className="bg-card p-6 rounded-2xl border shadow-sm">
-          <p className="text-[10px] font-bold text-muted-foreground">
-            ACCEPTED MEMBERS
-          </p>
-          <h3 className="text-4xl font-bold mt-2">18</h3>
-        </div>
+        <StatCard
+          title="ACCEPTED MEMBERS"
+          value={loading ? "..." : acceptedMembers}
+        />
       </div>
 
       {/* Main Grid */}
@@ -82,15 +87,25 @@ export const StatsOverview = () => {
             <h3 className="font-bold mb-6">
               Recent Applications
             </h3>
-            <RecentApplications />
+
+            {/* ✅ Pass real data */}
+            <RecentApplications applications={applications} />
           </div>
         </div>
 
         <div className="lg:col-span-4 space-y-6">
           <StartupHealthScore />
-          <UpcomingBenchmarks />
         </div>
       </div>
     </div>
   );
 };
+
+const StatCard = ({ title, value }) => (
+  <div className="bg-card p-6 rounded-2xl border shadow-sm">
+    <p className="text-[10px] font-bold text-muted-foreground">
+      {title}
+    </p>
+    <h3 className="text-4xl font-bold mt-2">{value}</h3>
+  </div>
+);
