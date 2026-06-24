@@ -12,7 +12,7 @@ const FounderDashboard = () => {
   const [activeTab, setActiveTab] = useState("Overview");
 
   return (
-    // 'lg:flex' ডেস্কটপে সাইডবার এবং কন্টেন্ট পাশাপাশি রাখবে।
+    
     <div className="min-h-screen bg-background lg:flex">
       
       {/* Sidebar Component (Handles both Mobile Nav and Desktop Sidebar internally) */}
