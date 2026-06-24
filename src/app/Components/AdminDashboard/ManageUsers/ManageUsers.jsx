@@ -33,7 +33,7 @@ const ManageUsers = () => {
   };
 
   useEffect(() => {
-    // ফাংশনটি ইফেক্টের ভেতরেই লিখুন
+    // function effec er vitor likhun 
     const loadUsers = async () => {
       try {
         setLoading(true);
