@@ -51,6 +51,7 @@ export const AdminOverview = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* total user overview */}
         {[
           { title: "Total Users", val: stats.users.toLocaleString() },
           { title: "Total Startups", val: stats.startups.toLocaleString() },
