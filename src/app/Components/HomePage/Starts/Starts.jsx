@@ -24,7 +24,7 @@ const Stats = () => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-[#0d0f17] px-6 md:px-10 py-12 transition-colors duration-300">
+    <div className="bg-white dark:bg-[#0d0f17] px-6 md:px-10 py-12 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <motion.div
           variants={container}

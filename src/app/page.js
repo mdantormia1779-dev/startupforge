@@ -6,7 +6,7 @@ import Trending from "./Components/HomePage/FeaturedOpportunities/FeaturedOpport
 import Experience from "./Components/HomePage/Experience/Experience";
 
 export default function Home() {
-  return <div>
+  return <div className="bg-white dark:bg-[#0d0f17]">
     <HeroSection></HeroSection>
     <Starts></Starts>
     <RisingStart></RisingStart>

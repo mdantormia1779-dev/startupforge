@@ -27,7 +27,7 @@ const FeaturedOpportunities = () => {
   }, []);
 
   return (
-    <section className="bg-white dark:bg-[#0b0e16] py-16 px-6 md:px-12 text-gray-900 dark:text-white transition-colors duration-300">
+    <section className="bg-white dark:bg-[#0d0f17] py-16 px-6 md:px-12 text-gray-900 dark:text-white transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}

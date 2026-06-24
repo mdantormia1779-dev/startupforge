@@ -51,63 +51,62 @@ const OpportunitiesPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0b0e16] text-gray-900 dark:text-white px-6 md:px-10 py-20">
-
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-extrabold mb-2">
-          Browse Opportunities
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Find your dream role and join startups.
-        </p>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-12 bg-gray-100 dark:bg-[#161922] p-4 rounded-2xl border">
-
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3.5 text-gray-400" size={18} />
-          <Input
-            placeholder="Search by role or skills..."
-            className="pl-10 h-12"
-            onChange={(e) => setSearch(e.target.value)}
-          />
+    <div className="bg-white dark:bg-[#0d0f17]">
+      <div className="max-w-7xl mx-auto min-h-screen text-gray-900 dark:text-white px-6 md:px-10 py-20">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-extrabold mb-2">Browse Opportunities</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Find your dream role and join startups.
+          </p>
         </div>
 
-        <Select onValueChange={setWorkTypeFilter}>
-          <SelectTrigger className="w-full md:w-48 h-12">
-            <SelectValue placeholder="Work Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="remote">Remote</SelectItem>
-            <SelectItem value="hybrid">Hybrid</SelectItem>
-            <SelectItem value="onsite">On-site</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4 mb-12 bg-gray-100 dark:bg-[#161922] p-4 rounded-2xl border">
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-3 top-3.5 text-gray-400"
+              size={18}
+            />
+            <Input
+              placeholder="Search by role or skills..."
+              className="pl-10 h-12"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
-      {/* Content */}
-      {loading ? (
-        <p className="text-center">Loading...</p>
-      ) : (
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job) => (
-              <ApplyCard key={job._id} job={job} />
-            ))
-          ) : (
-            <p className="text-center col-span-full">
-              No opportunities found.
-            </p>
-          )}
-        </motion.div>
-      )}
+          <Select onValueChange={setWorkTypeFilter}>
+            <SelectTrigger className="w-full md:w-48 h-12">
+              <SelectValue placeholder="Work Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="remote">Remote</SelectItem>
+              <SelectItem value="hybrid">Hybrid</SelectItem>
+              <SelectItem value="onsite">On-site</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <p className="text-center">Loading...</p>
+        ) : (
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => <ApplyCard key={job._id} job={job} />)
+            ) : (
+              <p className="text-center col-span-full">
+                No opportunities found.
+              </p>
+            )}
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };

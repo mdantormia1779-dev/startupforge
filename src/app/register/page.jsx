@@ -139,11 +139,11 @@ const RegistrationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white dark:bg-[#0d0f17] text-foreground flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-card border border-border p-8 rounded-3xl shadow-xl"
+        className="w-full max-w-md lg:max-w-2xl bg-card border border-border p-8 rounded-3xl shadow-xl"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">
           Join StartupForge
