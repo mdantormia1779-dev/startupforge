@@ -50,7 +50,6 @@ export const AdminOverview = () => {
 
   return (
     <div className="space-y-6">
-      {/* স্ট্যাটাস কার্ডস */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { title: "Total Users", val: stats.users.toLocaleString() },
