@@ -1,5 +1,5 @@
-import dns from 'node:dns';
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
@@ -12,25 +12,48 @@ export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client,
   }),
+
   emailAndPassword: {
     enabled: true,
   },
+
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     },
   },
-  // user মডেল আপডেট করুন
+
   user: {
     additionalFields: {
       role: {
         type: "string",
-        required: false, // 'true' থাকলে অনেক সময় ডিফল্ট ভ্যালু ছাড়া এরর দেয়
+        required: false,
       },
       isBlocked: {
         type: "boolean",
         required: false,
+      },
+    },
+  },
+
+  // 🔥 MAIN LOGIC (VERY IMPORTANT)
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const adminEmails = ["mdantormia1779@gmail.com"];
+
+          return {
+            data: {
+              ...user,
+              role: adminEmails.includes(user.email)
+                ? "Admin"
+                : "Founder", // ✅ Default role founder
+              isBlocked: false,
+            },
+          };
+        },
       },
     },
   },
