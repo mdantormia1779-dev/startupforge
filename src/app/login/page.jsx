@@ -30,7 +30,7 @@ const LoginPage = () => {
     }, {
       onRequest: () => setIsLoading(true),
       onSuccess: () => {
-        router.push("/"); // লগইন সফল হলে রিডাইরেক্ট
+        router.push("/"); 
         router.refresh();
       },
       onError: (ctx) => {
