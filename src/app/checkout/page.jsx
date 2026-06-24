@@ -1,64 +1,77 @@
 "use client";
 import React, { useState } from "react";
+import { loadStripe } from "@stripe/stripe-js";
 import { CreditCard, ShieldCheck, CheckCircle2 } from "lucide-react";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+);
 
 const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const handlePayment = async () => {
-    setLoading(true);
-    // এখানে আপনার Stripe Checkout API কল করবেন
-    setTimeout(() => {
+    try {
+      setLoading(true);
+
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+      const res = await fetch(`${API_URL}/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: 50 }),
+      });
+
+      const data = await res.json();
+
+      if (!data.url) throw new Error("No checkout URL received");
+
+      // 🔥 SIMPLE REDIRECT (NEW WAY)
+      window.location.href = data.url;
+    } catch (err) {
+      console.error("Payment error:", err);
+    } finally {
       setLoading(false);
-      setSuccess(true);
-      // পেমেন্ট সফল হলে ডাটাবেসে ট্রানজেকশন সেভ করুন
-    }, 2000);
+    }
   };
 
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-        <CheckCircle2 size={64} className="text-teal-500 mb-4" />
-        <h2 className="text-2xl font-bold text-foreground">Payment Successful!</h2>
-        <p className="text-muted-foreground mt-2">Thank you for upgrading to Premium.</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <CheckCircle2 className="text-green-500 w-16 h-16" />
+        <h2 className="text-2xl font-bold">Payment Successful</h2>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md my-10 mx-auto p-8 bg-card border border-border rounded-3xl shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 text-foreground">Upgrade to Premium</h2>
-      
-      {/* Pricing Card */}
-      <div className="bg-background p-6 rounded-2xl border border-border mb-6">
-        <p className="text-sm text-muted-foreground mb-1">Premium Package</p>
-        <h3 className="text-4xl font-extrabold text-foreground mb-4">$50<span className="text-lg font-medium text-muted-foreground">/once</span></h3>
-        <ul className="space-y-2 text-sm text-foreground">
-          <li>✅ Unlimited opportunity posts</li>
-          <li>✅ Priority support</li>
-          <li>✅ Advanced analytics dashboard</li>
-        </ul>
+    <div className="max-w-md mx-auto p-8 border rounded-2xl">
+      <h2 className="text-2xl font-bold mb-6">Upgrade to Premium</h2>
+
+      <div className="mb-6">
+        <p className="text-gray-500">Premium Plan</p>
+        <h3 className="text-4xl font-bold">$50</h3>
       </div>
 
-      {/* Payment Button */}
       <button
         onClick={handlePayment}
         disabled={loading}
-        className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold hover:opacity-90 flex items-center justify-center gap-2 transition-all"
+        className="w-full bg-black text-white p-4 rounded-xl flex justify-center gap-2"
       >
         {loading ? (
-          "Processing..."
+          "Redirecting..."
         ) : (
           <>
-            <CreditCard size={20} /> Pay with Stripe
+            <CreditCard size={18} /> Pay with Stripe
           </>
         )}
       </button>
 
-      <div className="flex items-center justify-center gap-2 mt-6 text-xs text-muted-foreground">
-        <ShieldCheck size={14} /> 100% Secure Payment Powered by Stripe
-      </div>
+      <p className="text-xs text-center mt-4 flex items-center justify-center gap-1">
+        <ShieldCheck size={14} /> Secure Payment
+      </p>
     </div>
   );
 };
