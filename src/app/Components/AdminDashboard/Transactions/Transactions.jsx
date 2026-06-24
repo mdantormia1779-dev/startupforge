@@ -6,7 +6,7 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ডাটাবেস থেকে পেমেন্ট ডাটা ফেচ করা
+// database theke data fetch kora
   useEffect(() => {
     const fetchPayments = async () => {
       try {
