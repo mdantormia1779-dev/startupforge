@@ -7,7 +7,7 @@ import ThemeToggle from "../../ThemeToggle/ThemeToggle";
 
 const AdminSidebar = ({ activeTab, setActiveTab }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+// admin over side bar
   const menuItems = [
     { name: "Overview", icon: <LayoutDashboard size={20} /> },
     { name: "Manage Users", icon: <Users size={20} /> },
