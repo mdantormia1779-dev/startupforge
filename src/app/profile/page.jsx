@@ -49,7 +49,7 @@ const ProfilePage = () => {
         await authClient.email.changeEmail({ newEmail: formData.email });
       }
 
-      // ৩. পাসওয়ার্ড পরিবর্তন (যদি নতুন পাসওয়ার্ড দেওয়া হয়)
+      
       if (formData.newPassword) {
         await authClient.password.update({ newPassword: formData.newPassword });
       }
