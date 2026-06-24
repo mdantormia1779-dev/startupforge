@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
-import { authClient } from "@/lib/auth-client"; // সেশন থেকে ডাটা নিতে
+import { authClient } from "@/lib/auth-client"; 
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 const ApplicationForm = ({ jobId, onSubmitSuccess }) => {
   const [loading, setLoading] = React.useState(false);
-  const { data: session } = authClient.useSession(); // ইউজারের তথ্য নেওয়ার জন্য
+  const { data: session } = authClient.useSession(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ const ApplicationForm = ({ jobId, onSubmitSuccess }) => {
       applicantEmail: formData.get("email"),
       portfolio: formData.get("portfolio"),
       motivation: formData.get("motivation"),
-      applicantName: session?.user?.name || "Anonymous", // নাম যোগ করা ভালো
+      applicantName: session?.user?.name || "Anonymous", 
       status: "Pending",
     };
 
