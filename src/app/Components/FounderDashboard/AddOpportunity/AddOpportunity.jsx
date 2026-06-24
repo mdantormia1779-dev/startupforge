@@ -30,30 +30,38 @@ const AddOpportunity = () => {
   };
 
   // ইউজার অনুযায়ী পোস্ট সংখ্যা চেক করার জন্য useEffect
+  // useEffect এর ভেতরে এই অংশটি আপডেট করুন
+  // AddOpportunity.jsx এর useEffect এ এই অংশটি নিশ্চিত করুন
   useEffect(() => {
-    // ফাংশনটি এখন সরাসরি useEffect এর ভেতরে async হিসেবে থাকবে
-    const fetchCount = async () => {
+    const fetchData = async () => {
       if (!userId) return;
-
+      setLoading(true);
       try {
-        setLoading(true);
-        const res = await fetch(
+        // ১. পোস্ট সংখ্যা চেক
+        const oppRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/opportunities?ownerId=${userId}`,
         );
-        const data = await res.json();
+        const oppData = await oppRes.json();
+        setOpportunities(oppData);
 
-        // এখানে setState কল করা হচ্ছে অসিঙ্ক্রোনাস কলের ভেতরে, তাই এটি ঠিক আছে
-        setOpportunities(data);
+        // ২. পেমেন্ট চেক (প্রিমিয়াম স্ট্যাটাস)
+        const payRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/payments/check-premium/${userId}`,
+        );
+        const payData = await payRes.json();
+
+        // payData.isPremium যদি true হয়, তবে সে আনলিমিটেড পোস্ট করতে পারবে
+        setIsPremium(payData.isPremium);
       } catch (err) {
-        console.error("Error fetching count:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCount();
-  }, [userId]); // userId পরিবর্তন হলে এটি আবার কল হবে
-  // যদি প্রিমিয়াম না হন এবং পোস্ট সংখ্যা ৩ বা তার বেশি হয়, তবে লক
+    fetchData();
+  }, [userId]);
+
   const canPost = isPremium || opportunities.length < 3;
 
   const [formData, setFormData] = useState({
