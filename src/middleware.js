@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function middleware(request) {
-  const sessionToken = request.cookies.get("better-auth.session_token")?.value;
+  const sessionToken = request.cookies.get("__Secure-better-auth.session_token")?.value;
   const { pathname } = request.nextUrl;
 
   // ১. কোনো কুকি না থাকলে সরাসরি লগইনে পাঠান
