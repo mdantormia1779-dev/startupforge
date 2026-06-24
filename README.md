@@ -17,7 +17,7 @@ Framework: Next.js (App Router)
 
 Styling: Tailwind CSS
 
-Authentication: (আপনার Auth Client-এর নাম, যেমন: BetterAuth/NextAuth)
+Authentication: BetterAuth/NextAuth
 
 State Management: React Hooks (useState, useEffect)
 
